@@ -8,19 +8,25 @@ export default function Home() {
   const [targetType, setTargetType] = useState("中小企業");
   const [result, setResult] = useState<{ rank: string; review: string } | null>(null);
 
- const handleDiagnose = async () => {
-    // 判定はプログラムで確定させる（中村さんのこだわりポイント！）
-    const rank = targetType === "中小企業" ? "S" : "A";
-    
-    // APIを呼び出してAIレビューを取得
+// page.tsx の handleDiagnose 関数の中身
+const handleDiagnose = async () => {
+  const rank = targetType === "中小企業" ? "S" : "A";
+  
+  try {
     const response = await fetch("/api/diagnose", {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json", // 👈 この一行を必ず追加してください！
+      },
       body: JSON.stringify({ university, position, gakuchika, targetType }),
     });
+
     const data = await response.json();
-    
-    setResult({ rank, review: data.review });
-  };
+    setResult({ rank, review: data.review }); // ここでAIの回答を受け取ります
+  } catch (error) {
+    console.error("通信エラー:", error);
+  }
+};
 
   return (
     <main className="min-h-screen bg-slate-50 p-8 font-sans text-slate-900">
