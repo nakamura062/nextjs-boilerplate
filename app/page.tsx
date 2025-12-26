@@ -8,25 +8,35 @@ export default function Home() {
   const [targetType, setTargetType] = useState("中小企業");
   const [result, setResult] = useState<{ rank: string; review: string } | null>(null);
 
-// page.tsx の handleDiagnose 関数の中身
-const handleDiagnose = async () => {
-  const rank = targetType === "中小企業" ? "S" : "A";
-  
-  try {
-    const response = await fetch("/api/diagnose", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json", // 👈 この一行を必ず追加してください！
-      },
-      body: JSON.stringify({ university, position, gakuchika, targetType }),
-    });
+ const handleDiagnose = async () => {
+    const rank = targetType === "中小企業" ? "S" : "A";
+    
+    try {
+      const response = await fetch("/api/diagnose", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", // 👈 AIが読み取るために絶対必要な1行！
+        },
+        body: JSON.stringify({ university, position, gakuchika, targetType }),
+      });
 
-    const data = await response.json();
-    setResult({ rank, review: data.review }); // ここでAIの回答を受け取ります
-  } catch (error) {
-    console.error("通信エラー:", error);
-  }
-};
+      const data = await response.json();
+      setResult({ rank, review: data.review });
+    } catch (error) {
+      console.error("エラーです:", error);
+    }
+  };
+      
+      if (data.review) {
+        setResult({ rank, review: data.review });
+      } else {
+        alert("AIからの回答が空でした。もう一度試してください。");
+      }
+    } catch (error) {
+      console.error("通信エラー:", error);
+      alert("通信に失敗しました。インターネット接続やAPIの設定を確認してください。");
+    }
+  };
 
   return (
     <main className="min-h-screen bg-slate-50 p-8 font-sans text-slate-900">
@@ -67,7 +77,7 @@ const handleDiagnose = async () => {
               <div className="text-9xl font-black text-red-500 drop-shadow-lg">{result.rank}</div>
             </div>
             <div className="p-6 bg-indigo-50 rounded-xl border-l-8 border-indigo-500 text-left">
-              <p className="leading-relaxed text-indigo-900 font-medium">
+              <p className="leading-relaxed text-indigo-900 font-medium whitespace-pre-wrap">
                 {result.review}
               </p>
             </div>
