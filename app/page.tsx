@@ -8,25 +8,22 @@ export default function Home() {
   const [targetType, setTargetType] = useState("中小企業");
   const [result, setResult] = useState<{ rank: string; review: string } | null>(null);
 
- const handleDiagnose = async () => {
+  // 診断ボタンを押した時の処理
+  const handleDiagnose = async () => {
+    // 判定ロジック（中村さんのこだわりポイント！）
     const rank = targetType === "中小企業" ? "S" : "A";
     
     try {
       const response = await fetch("/api/diagnose", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json", // 👈 AIが読み取るために絶対必要な1行！
+          "Content-Type": "application/json", // AIがデータを読み取るために必須
         },
         body: JSON.stringify({ university, position, gakuchika, targetType }),
       });
 
       const data = await response.json();
-      setResult({ rank, review: data.review });
-    } catch (error) {
-      console.error("エラーです:", error);
-    }
-  };
-      
+
       if (data.review) {
         setResult({ rank, review: data.review });
       } else {
